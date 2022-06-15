@@ -182,4 +182,77 @@ const buildGraph = (edges)=>{
     return graph;
 }
 
-//left off at 1:00:13
+//COMPONENT COUNT - Time O(e); Space 0(n) where e = edges; n= nodes;  linear time and space
+
+    const connectedComponentsCount = (graph)=>{
+        const visited = new Set()
+        let count = 0;
+
+        for(let node in graph){
+            //do DFS
+            if(explore(graph,node,visited)===true){
+                count += 1;
+            };
+        }
+
+        return count; 
+    }
+
+    //explore a component as far as possible
+    const explore = (graph,current,visited)=>{
+        if(visited.has(String(current))) return false;
+        visited.add(String(current));
+
+        for (neighbor of graph[current]){
+            explore(graph,neighbor,visited)
+        }
+        
+        return true
+    }
+ 
+    const components = {
+        0:['8','1','5'],
+        1:['0'],
+        5:['0','8'],
+        8:['0','5'],
+        2:['3','4'],
+        3:['2','4'],
+        4:['3','2'],
+    }
+
+    //note that javascript object keys are often interpreted as strings and this can mess up your code,  That's why we used String(current)
+    // console.log(connectedComponentsCount(components)) //returns 2
+
+
+//LARGEST COMPONENT SIZE PROBLEM
+//Visit all nodes, and mark each as visited using DFS, counting each node as well to keep track of component size, then store that as the currentLargestComponent before searching the rest of the graph
+//Then move to the next node, if already visited, there is no need to traverse because you've already coounted this node in your component
+//Move to the next 'unvisited' node and start another traversal
+
+const largestComponent = (graph)=>{
+    const visited = new Set();
+    let longest = 0;
+    //iterate through nodes
+    for(let node in graph){
+
+        const size = exploreSize(graph,node,visited);
+        if(size>longest) longest = size;
+    }
+    return longest;
+}
+const exploreSize = (graph, node, visited) => {
+    //if you've already visited a node, don't count it
+    if(visited.has(node)) return 0;
+    //else add the node to visited and count it as 1
+    visited.add(node)
+    let size = 1;
+   
+    //recursively explore its neighbor nodes and count unvisited, incrementing size variable
+    for(let neighbor of graph[node]){
+        size += exploreSize(graph, neighbor, visited)
+    }
+    
+    return size;
+}
+
+console.log(largestComponent(components)) // returns 4
